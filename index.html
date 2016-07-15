@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en-us">
+
+<head>
+<meta charset="utf-8">
+<title>Problem of Appolonius</title>
+<link rel="stylesheet" href="css/style.css" type="text/css" />
+</head>
+
+<body>
+	<form>
+		<label for="number">
+			<span>Input number of points: </span>
+			<input type="number" min="4" max="1000" value="100" id="number"/>
+		</label>
+		<label for="drawPoints">
+			<input type = "button" id="drawPoints" value="Draw points">
+		</label>
+		<label for="drawHall">
+			<input type = "button" id="drawHall" value="Draw hall">
+		</label>
+		<label for="clearCanvas">
+			<input type = "button" id="clearCanvas" value="Clear canvas">
+		</label>
+	</form>
+	<canvas id="canvas"></canvas>
+	<script src="js/models/Point.js"></script>
+	<script src="js/models/Circle.js"></script>
+	<script src="js/view/Drawer.js"></script>
+	<script src="main.js"></script>
+</body>
+</html>

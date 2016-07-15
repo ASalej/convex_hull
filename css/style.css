@@ -1,0 +1,43 @@
+form {
+    padding-bottom: 10px;
+    border-bottom: 1px solid #b6124a;
+}
+span {
+    display: inline-block;
+    font-family: 'Roboto Condensed', sans-serif;
+    text-transform: uppercase;
+    line-height: 20px;
+    font-size: 15px;
+    transform: scaleX(0.8);
+    color: #b6124a;
+}
+input[type = number] {
+    padding: 10px;
+    border-radius: 2px;
+    border: 1px solid #747386;
+    -webkit-box-shadow: inset -7px -7px 2px -6px rgba(0,0,0,0.2);
+    -moz-box-shadow: inset -7px -7px 2px -6px rgba(0,0,0,0.2);
+    box-shadow: inset -7px -7px 2px -6px rgba(0,0,0,0.2);
+}
+input[type="button"] {
+    padding: 8px;
+    color: #b6124a;
+    font-family: 'Roboto Condensed', sans-serif;
+    text-transform: uppercase;
+    line-height: 20px;
+    font-size: 15px;
+    font-weight: bold;
+    font-stretch: condensed;
+    transform: scaleX(0.8);
+    background-color: #f5ebeb;
+    border-radius: 4px;
+    border: 2px solid #b6124a;
+    box-shadow: 2px 2px 5px rgba(0,0,0, 0.2);
+}
+
+input[type="button"]:hover {
+    cursor: pointer;
+    color: white;
+    background-color: #b6124a;
+    border-color: #b6124a;
+}
