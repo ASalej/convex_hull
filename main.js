@@ -4,9 +4,10 @@ var CANVAS_HEIGHT = 500;
 var CANVAS_WIDTH = 1000;
 var drawer = new Drawer('canvas', CANVAS_HEIGHT, CANVAS_WIDTH);
 var points;
+var extrem_y;
 
 var drawPoints = document.getElementById('drawPoints');
-var drawHall = document.getElementById('drawHall');
+var drawHull = document.getElementById('drawHull');
 var clearCanvas = document.getElementById('clearCanvas');
 
 drawPoints.onclick = function () {
@@ -16,9 +17,10 @@ drawPoints.onclick = function () {
     drawer.drawPoints(points, '#26244a');
 }
 
-drawHall.onclick = function () {
-    var chain = getHall(points);
+drawHull.onclick = function () {
+    var chain = getHull(points);
     drawer.drawPoligon(chain, '#b6124a');
+    console.log(getPoligonSquare(chain));
 }
 
 clearCanvas.onclick = function () {
@@ -28,8 +30,29 @@ clearCanvas.onclick = function () {
 
 /* LOGIC FUNCTIONS */
 
-function getHall(points) {
-    var extrem_y = getExtremYIndex(points);
+function getPoligonSquare(chain) {
+    var min_y = points[extrem_y[1]],
+        max_y = points[extrem_y[0]];
+    var central_point = new Point((min_y.x + max_y.x)/2, (min_y.y + max_y.y)/2);
+    drawer.drawPoint(central_point, 'magenta');
+    var common_square = 0;
+    for(let i = 0; i < chain.length - 1; i++) {
+        common_square += getTriangleSquare(chain[i], chain[i + 1], central_point); 
+    }
+    return common_square;
+}
+
+function getTriangleSquare(p1, p2, p3) {
+    var a = getDistanсe(p1, p2),
+        b = getDistanсe(p2, p3),
+        c = getDistanсe(p1, p3);
+    var p = (a + b + c) / 2;
+    var square = Math.sqrt(p*(p - a)*(p-b)*(p-c));
+    return square;
+}
+
+function getHull(points) {
+    extrem_y = getExtremYIndex(points);
     var min_y = extrem_y[1],
         max_y = extrem_y[0];
     swap(points[0], points[max_y]);
@@ -155,6 +178,11 @@ function inspectNewCircle(circles, circle) {
 }
 
 function getDistanсe(x1, y1, x2, y2) {
+    if(x1 instanceof Point) {
+        var point1 = x1,
+            point2 = y1;
+        return Math.sqrt((point1.x - point2.x) * (point1.x - point2.x) + (point1.y - point2.y) * (point1.y - point2.y));
+    }
     return Math.sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
 }
 
