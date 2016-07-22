@@ -1,27 +1,39 @@
 'use strict'
 
 var CANVAS_HEIGHT = 500;
-var CANVAS_WIDTH = 1000;
+var CANVAS_WIDTH = 500;
 var drawer = new Drawer('canvas', CANVAS_HEIGHT, CANVAS_WIDTH);
 var points;
-var extrem_y;
 
 var drawPoints = document.getElementById('drawPoints');
 var drawHull = document.getElementById('drawHull');
+var drawTriangulation = document.getElementById('drawTriangulation');
 var clearCanvas = document.getElementById('clearCanvas');
 
-drawPoints.onclick = function () {
+drawHull.onclick = function () {
     drawer.clearCanvas();
     var point_number = parseInt(document.getElementById('number').value);
     points = genRandomPoints(point_number);
     drawer.drawPoints(points, '#26244a');
-}
-
-drawHull.onclick = function () {
     var chain = getHull(points);
     drawer.drawPoligon(chain, '#b6124a');
     console.log(getPoligonSquare(chain));
 }
+
+drawTriangulation.onclick = function () {
+    points.sort(compare);
+    console.log(pointsToStr(points));
+    
+    function dividePointSet(subset) {
+        while(subset.length > 3) {
+            var first_half = subset.slice(0, Math.floor(subset.length/2));
+            var second_half = subset.slice(Math.floor(subset.length/2), subset.length);
+            dividePointSet(first_half);
+            dividePointSet(second_half);
+        }
+        
+    }
+} 
 
 clearCanvas.onclick = function () {
     drawer.clearCanvas();
@@ -30,9 +42,97 @@ clearCanvas.onclick = function () {
 
 /* LOGIC FUNCTIONS */
 
+function compare(p1, p2) {
+    if (p1.x < p2.x) {
+        return -1;
+    }
+    if (p1.x > p2.x) {
+        return 1;
+    }
+    if(p1.x = p2.x) {
+        if(p1.y < p2.y) {
+            return -1; 
+        } 
+        if(p1.y > p2.y) {
+            return 1;
+        }
+        if(p1.y = p2.y) {
+            return 0;
+        }
+    }
+}
+
+function getCircleByThreePoints(a, b, c) {
+    var mid_ab = new Point((a.x + b.x) / 2, (a.y + b.y) / 2),
+        mid_bc = new Point((b.x + c.x) / 2, (b.y + c.y) / 2),
+        line_ab = getLineByTwoPoints(a, b),
+        line_bc = getLineByTwoPoints(b, c);
+    var perpendicular1 = getPerpendicularToLineInPoint(line_ab, mid_ab),
+        perpendicular2 = getPerpendicularToLineInPoint(line_bc, mid_bc);
+    var circle_center = getIntersectionPointOfTwoLines(perpendicular1, perpendicular2),
+        radius = getDistanсe(circle_center, a);
+    var circle = new Circle(circle_center.x, circle_center.y, radius);
+    return circle;
+}
+
+function getPerpendicularToLineInPoint(line, point) {
+    var a1 = line.a,
+        b1 = line.b;
+    var x = point.x,
+        y = point.y;
+    var new_a = -b1,
+        new_b = a1,
+        new_c = - new_a * x - new_b * y;
+    var res_line = new Line(new_a, new_b, new_c);
+    return res_line;
+}
+
+// y = k1*x + b1, y = k2*x + b2
+function getIntersectionPointOfTwoLines(a1, b1, c1, a2, b2, c2) {
+    if(a1 instanceof Line) {
+        var line1 = a1,
+            line2 = b1;
+        c1 = a1.c;
+        a2 = b1.a;
+        c2 = b1.c;
+        b2 = b1.b;
+        b1 = a1.b;
+        a1 = a1.a;
+    }
+    var x, y;
+    if(a1 * b2 - a2 * b1 !== 0) {
+        x = - (c1 * b2 - c2 * b1) / (a1 * b2 - a2 * b1);
+        y = - (a1 * c2 - a2 * c1) / (a1 * b2 - a2 * b1);
+    }  else  {
+        if (a2 * c2 - a2 * c1 === 0 && b1 * c2 - b2 * c1 === 0) {
+            // lines identical
+            return line1;
+        } else {
+            // parallel lines
+            return null;
+        }
+    }
+    /*
+    var x = (b2 - b1) / (k1 - k2),
+        y = (b2 * k1 - k2 * b1) / (k1 - k2);
+    */
+    var point = new Point(x, y);
+    return point;
+}
+
+function getLineByTwoPoints(p1, p2) {
+    var a = p2.y - p1.y,
+        b = p1.x - p2.x,
+        c = p1.x * p2.y - p1.y * p2.x;
+    //var k = (p1.y - p2.y) / (p1.x - p2.x),
+    //    b = (p1.x * p2.y - p1.y * p2.x) / (p1.x - p2.x);
+    var line = new Line(a, b, c);
+    return line;
+}
+
 function getPoligonSquare(chain) {
-    var min_y = points[extrem_y[1]],
-        max_y = points[extrem_y[0]];
+    var min_y = points[getMaxY(points)],
+        max_y = points[getMinY(points)];
     var central_point = new Point((min_y.x + max_y.x)/2, (min_y.y + max_y.y)/2);
     drawer.drawPoint(central_point, 'magenta');
     var common_square = 0;
@@ -52,11 +152,8 @@ function getTriangleSquare(p1, p2, p3) {
 }
 
 function getHull(points) {
-    extrem_y = getExtremYIndex(points);
-    var min_y = extrem_y[1],
-        max_y = extrem_y[0];
-    swap(points[0], points[max_y]);
-    swap(points[1], points[min_y]);
+    swapPoints(points[0], points[getMaxY(points)]);
+    swapPoints(points[1], points[getMinY(points)]);
     
     var chain;
     if(isRighter(points[2], points[0], points[1]) === 1) {
@@ -94,7 +191,7 @@ function getVisibleSides(point, chain) {
     return result;
 }
 
-function swap(a, b) {
+function swapPoints(a, b) {
     var temp = new Point(a.x, a.y);
     a.x = b.x;
     a.y = b.y;
@@ -102,23 +199,30 @@ function swap(a, b) {
     b.y = temp.y;
 }
 
-function getExtremYIndex(points) {
+// return index
+function getMaxY(points) {
     var max_y = points[0].y,
-        min_y = points[0].y;
-    var min_index = 0,
-        max_index = 0;
+        max_index = 0;  
     for(let i = 1; i < points.length; i++) {
         if(points[i].y > max_y) {
             max_y = points[i].y;
             max_index = i;
         }
-        if(points[i].y <= min_y) {
+    }
+    return max_index;
+}
+
+// return index 
+function getMinY(points) {
+    var min_y = points[0].y,
+        min_index = 0;  
+    for(let i = 1; i < points.length; i++) {
+        if(points[i].y < min_y) {
             min_y = points[i].y;
             min_index = i;
         }
     }
-    console.log(max_y);
-    return [max_index, min_index];
+    return min_index;
 }
 
 function isRighter(point, start_point, end_point) {

@@ -13,18 +13,20 @@
 			<span>Input number of points: </span>
 			<input type="number" min="4" max="1000" value="100" id="number"/>
 		</label>
-		<label for="drawPoints">
-			<input type = "button" id="drawPoints" value="Draw points">
-		</label>
 		<label for="drawHall">
 			<input type = "button" id="drawHull" value="Draw hall">
+		</label>
+		<label for="drawTriangulation">
+			<input type = "button" id="drawTriangulation" value="Draw Triangulation">
 		</label>
 		<label for="clearCanvas">
 			<input type = "button" id="clearCanvas" value="Clear canvas">
 		</label>
 	</form>
 	<canvas id="canvas"></canvas>
+	<script src="js/helper.js"></script>
 	<script src="js/models/Point.js"></script>
+	<script src="js/models/Line.js"></script>
 	<script src="js/view/Drawer.js"></script>
 	<script src="main.js"></script>
 </body>
