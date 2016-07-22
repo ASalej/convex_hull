@@ -9,6 +9,7 @@ var drawPoints = document.getElementById('drawPoints');
 var drawHull = document.getElementById('drawHull');
 var drawTriangulation = document.getElementById('drawTriangulation');
 var clearCanvas = document.getElementById('clearCanvas');
+var drawCircle = document.getElementById('drawCircle');
 
 drawHull.onclick = function () {
     drawer.clearCanvas();
@@ -34,6 +35,16 @@ drawTriangulation.onclick = function () {
         
     }
 } 
+
+drawCircle.onclick = function () {
+    drawer.clearCanvas();
+    var three_points = genRandomPoints(3);
+    drawer.drawPoints(three_points);
+    var circle = getCircleByThreePoints(three_points[0], three_points[1], three_points[2]);
+    if(circle) {
+        drawer.drawCircle(circle);git 
+    }
+}
 
 clearCanvas.onclick = function () {
     drawer.clearCanvas();
@@ -67,12 +78,14 @@ function getCircleByThreePoints(a, b, c) {
         mid_bc = new Point((b.x + c.x) / 2, (b.y + c.y) / 2),
         line_ab = getLineByTwoPoints(a, b),
         line_bc = getLineByTwoPoints(b, c);
-    var perpendicular1 = getPerpendicularToLineInPoint(line_ab, mid_ab),
-        perpendicular2 = getPerpendicularToLineInPoint(line_bc, mid_bc);
-    var circle_center = getIntersectionPointOfTwoLines(perpendicular1, perpendicular2),
-        radius = getDistanсe(circle_center, a);
-    var circle = new Circle(circle_center.x, circle_center.y, radius);
-    return circle;
+    if(isRighter(a, b, c) !== 0) {
+        var perpendicular1 = getPerpendicularToLineInPoint(line_ab, mid_ab),
+            perpendicular2 = getPerpendicularToLineInPoint(line_bc, mid_bc);
+        var circle_center = getIntersectionPointOfTwoLines(perpendicular1, perpendicular2),
+            radius = getDistanсe(circle_center, a);
+        var circle = new Circle(circle_center.x, circle_center.y, radius);
+        return circle;
+    }
 }
 
 function getPerpendicularToLineInPoint(line, point) {
