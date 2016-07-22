@@ -1,7 +1,9 @@
 class Line {
     constructor(a, b, c) {
-        this.a = a;
-        this.b = b;
-        this.c = c
+        if(a + b !== 0) {
+            this.a = a;
+            this.b = b;
+            this.c = c    
+        }
     }
 }
