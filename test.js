@@ -80,3 +80,16 @@ describe('#getPerpendicularToLineInPoint(line, point)', function() {
         (result.a/result.c).should.equal(res_line.a/res_line.c);
     });
 });
+
+describe('#getCircleByThreePoints(a, b, c)', function() {
+   it('((1, 4), (1, 1), (5, 1))', function () {
+        var a = new Point(1, 4),
+            b = new Point(1, 1),
+            c = new Point(5, 1);
+        var result = getCircleByThreePoints(a, b, c);
+        var res_circle = new Circle(3, 2.5, 2.5);
+        (result.xCenter).should.equal(res_circle.xCenter);
+        (result.yCenter).should.equal(res_circle.yCenter);
+        (result.radius).should.equal(res_circle.radius);
+   }) 
+});
