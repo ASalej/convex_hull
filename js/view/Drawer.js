@@ -57,4 +57,10 @@ class Drawer {
         }
         this.context.stroke();
     }
+    
+    drawCircle(circle) {
+        this.context.beginPath();
+        this.context.arc(circle.xCenter, circle.yCenter, circle.radius, 0, 2 * Math.PI, false);
+        this.context.stroke();
+    }
 }
