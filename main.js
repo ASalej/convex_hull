@@ -22,11 +22,59 @@ drawHull.onclick = function () {
 }
 
 drawTriangulation.onclick = function () {
+    drawer.clearCanvas();
+    var point_number = parseInt(document.getElementById('number').value);
+    points = genRandomPoints(point_number);
     points.sort(compare);
+    drawer.drawPoints(points);
     console.log(pointsToStr(points));
+    var graph = new Graph([[points[0], points[1]], [points[1], points[2]], [points[0], points[2]]]);
+    drawer.drawGraph(graph, 'yellow');
+    for(let i = 3; i < points.length; i++) {
+        var vertices = graph.getVertices();
+        drawer.drawPoint(points[i], 'magenta');
+        //var closest_points = getTwoClosestPoinsToPoint(vertices, points[i]);
+        var closest_point_index = getClosestPoint(vertices, points[i]);
+        var closest_point = vertices[closest_point_index];
+        var index = points.indexOf(closest_point);
+        var closest_point2 = points[index + 1];
+        
+        drawer.drawPoints([closest_point, closest_point2], 'blue');
+        //var incident_points1 = graph.getIncidentToVertex(closest_points[0]).sort(compare);
+        //var incident_points2 = graph.getIncidentToVertex(closest_points[1]).sort(compare);
+        var incident_points1 = graph.getIncidentToVertex(closest_point).sort(compare);
+        var incident_points2 = graph.getIncidentToVertex(closest_point2).sort(compare);
+        
+        var res = incident_points1.concat(incident_points2).sort(compare);
+        var fourth_point = getDoublePoint(res);
+        drawer.drawPoint(fourth_point, 'lime');
+        /*
+        if(getDistanсe(closest_points[0], closest_points[1]) > getDistanсe(points[i], fourth_point)) {
+            graph.removeEdge(graph.findEdge(closest_points[0], closest_points[1]));
+            graph.addEdge(fourth_point, points[i]);
+            graph.addEdge(closest_points[0], points[i]);
+            graph.addEdge(closest_points[1], points[i]);
+        } else {
+            graph.addEdge(closest_points[0], points[i]);
+            graph.addEdge(closest_points[1], points[i]);
+        }
+        */
+        if(getDistanсe(closest_point, closest_point2) > getDistanсe(points[i], fourth_point)) {
+            graph.removeEdge(graph.findEdge(closest_point, closest_point2));
+            graph.addEdge(fourth_point, points[i]);
+            graph.addEdge(closest_point, points[i]);
+            graph.addEdge(closest_point2, points[i]);
+        } else {
+            graph.addEdge(closest_point, points[i]);
+            graph.addEdge(closest_point2, points[i]);
+        }
+        drawer.drawGraph(graph);
+    }
+    drawer.drawGraph(graph);
     
+    /*
     function dividePointSet(subset) {
-        while(subset.length > 3) {
+        if(subset.length > 3) {
             var first_half = subset.slice(0, Math.floor(subset.length/2));
             var second_half = subset.slice(Math.floor(subset.length/2), subset.length);
             dividePointSet(first_half);
@@ -34,6 +82,7 @@ drawTriangulation.onclick = function () {
         }
         
     }
+    */
 } 
 
 drawCircle.onclick = function () {
@@ -42,7 +91,7 @@ drawCircle.onclick = function () {
     drawer.drawPoints(three_points);
     var circle = getCircleByThreePoints(three_points[0], three_points[1], three_points[2]);
     if(circle) {
-        drawer.drawCircle(circle);git 
+        drawer.drawCircle(circle);
     }
 }
 
@@ -71,6 +120,15 @@ function compare(p1, p2) {
             return 0;
         }
     }
+}
+
+function getDoublePoint(points) {
+    for(let i = 0; i < points.length - 1; i++) {
+        if(compare(points[i], points[i + 1]) === 0) {
+            return points[i];
+        }
+    }
+    return -1;
 }
 
 function getCircleByThreePoints(a, b, c) {
@@ -292,6 +350,28 @@ function inspectNewCircle(circles, circle) {
         }
     }
     return result;
+}
+
+function getTwoClosestPoinsToPoint(vertices, point) {
+    var p1_index = getClosestPoint(vertices, point);
+    var p1 = vertices[p1_index];
+    vertices = (vertices.slice(0, p1_index)).concat(vertices.slice(p1_index + 1));
+    var p2_index = getClosestPoint(vertices, point);
+    var p2 = vertices[p2_index];
+    return [p1, p2];
+}
+
+function getClosestPoint(points, point) {
+    var d = Number.POSITIVE_INFINITY,
+        index;
+    for(let i = 0; i < points.length; i++) {
+        var r = getDistanсe(points[i], point);
+        if(r < d) {
+            index = i;
+            d = r;
+        }
+    }
+    return index;
 }
 
 function getDistanсe(x1, y1, x2, y2) {
