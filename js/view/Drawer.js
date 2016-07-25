@@ -63,4 +63,10 @@ class Drawer {
         this.context.arc(circle.xCenter, circle.yCenter, circle.radius, 0, 2 * Math.PI, false);
         this.context.stroke();
     }
+    
+    drawGraph(graph, color) {
+        for(let i = 0; i < graph.graph.length; i++) {
+            this.drawLine(graph.graph[i][0], graph.graph[i][1], 0, 0, color);
+        }
+    }
 }
