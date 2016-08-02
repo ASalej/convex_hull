@@ -46,6 +46,12 @@ class Drawer {
         }
     }
     
+    drawTriange(p1, p2, p3, color) {
+        this.drawLine(p1, p2, 0, 0, color);
+        this.drawLine(p2, p3, 0, 0, color);
+        this.drawLine(p3, p1, 0, 0, color);
+    }
+    
     drawPoligon(points, color) {
         if (color !== 'undefined') {
             this.context.strokeStyle = color;
