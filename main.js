@@ -25,8 +25,9 @@ drawTriangulation.onclick = function () {
     drawer.clearCanvas();
     var point_number = parseInt(document.getElementById('number').value);
     points = genRandomPoints(point_number);
-    points.sort(compare);
     drawer.drawPoints(points);
+    /*
+    points.sort(compare);
     console.log(pointsToStr(points));
     var graph = new Graph([[points[0], points[1]], [points[1], points[2]], [points[0], points[2]]]);
     drawer.drawGraph(graph, 'yellow');
@@ -58,7 +59,7 @@ drawTriangulation.onclick = function () {
             graph.addEdge(closest_points[0], points[i]);
             graph.addEdge(closest_points[1], points[i]);
         }
-        */
+        */ /*
         if(getDistanсe(closest_point, closest_point2) > getDistanсe(points[i], fourth_point)) {
             graph.removeEdge(graph.findEdge(closest_point, closest_point2));
             graph.addEdge(fourth_point, points[i]);
@@ -71,18 +72,75 @@ drawTriangulation.onclick = function () {
         drawer.drawGraph(graph);
     }
     drawer.drawGraph(graph);
-    
-    /*
-    function dividePointSet(subset) {
-        if(subset.length > 3) {
-            var first_half = subset.slice(0, Math.floor(subset.length/2));
-            var second_half = subset.slice(Math.floor(subset.length/2), subset.length);
-            dividePointSet(first_half);
-            dividePointSet(second_half);
-        }
-        
-    }
     */
+    dividePointSet(points);
+    
+    function dividePointSet(subset, is_horizontal_separator) {
+        if(subset.length >= 3) {
+            if(subset.length > 12) {
+                var first_half = [],
+                    second_half = [],
+                    separator;
+                if(is_horizontal_separator === undefined) {
+                    is_horizontal_separator = true;
+                }
+                if(is_horizontal_separator) {
+                    separator = Math.floor((subset[getMaxX(subset)].x + subset[getMinX(subset)].x) / 2);
+                    //drawer.drawLine(separator, 0, separator, CANVAS_HEIGHT, 'yellow');
+                    for(let i = 0; i < subset.length; i++) {
+                        if(subset[i].x < separator) {
+                            first_half.push(subset[i]);
+                        } else {
+                            second_half.push(subset[i]);
+                        }
+                    }
+                } else {
+                    separator = Math.floor((subset[getMaxY(subset)].y + subset[getMinY(subset)].y) / 2);
+                    //drawer.drawLine(0, separator, CANVAS_WIDTH, separator, 'yellow');
+                    for(let i = 0; i < subset.length; i++) {
+                        if(subset[i].y < separator) {
+                            first_half.push(subset[i]);
+                        } else {
+                            second_half.push(subset[i]);
+                        }
+                    }
+                }
+            
+            
+                //var first_half = subset.slice(0, Math.floor(subset.length/2));
+                //var second_half = subset.slice(Math.floor(subset.length/2), subset.length);
+                var color1 = 'rgb('+ getRandomInt(0,255)+ ','+getRandomInt(0,255)+ ','+ getRandomInt(0,255) +')',
+                    color2 = 'rgb('+ getRandomInt(0,255)+ ','+getRandomInt(0,255)+ ','+ getRandomInt(0,255) +')';
+                drawer.drawPoints(first_half, color1);
+                drawer.drawPoints(second_half, color2);
+                dividePointSet(first_half, !is_horizontal_separator);
+                dividePointSet(second_half, !is_horizontal_separator);
+            } else {
+                switch(subset.length) {
+                    case 3: 
+                        drawer.drawPoints(subset, 'red');
+                        drawer.drawTriange(subset[0], subset[1], subset[2], 'yellow');
+                        break;
+                    case 4:
+                        drawer.drawPoints(subset, 'blue');
+                        break;
+                    case 5: 
+                        drawer.drawPoints(subset, 'green');
+                        break;
+                    case 8:
+                        subset.sort(compare);
+                        dividePointSet(subset.slice(0, 4), !is_horizontal_separator);
+                        dividePointSet(subset.slice(4), !is_horizontal_separator);
+                        break;
+                    default:
+                        subset.sort(compare);
+                        dividePointSet(subset.slice(0, 3), !is_horizontal_separator);
+                        dividePointSet(subset.slice(3), !is_horizontal_separator);
+                        break;
+                }
+            }
+        }    
+    }
 } 
 
 drawCircle.onclick = function () {
@@ -290,6 +348,32 @@ function getMinY(points) {
     for(let i = 1; i < points.length; i++) {
         if(points[i].y < min_y) {
             min_y = points[i].y;
+            min_index = i;
+        }
+    }
+    return min_index;
+}
+
+// return index 
+function getMaxX(points) {
+    var max_x = points[0].x,
+        max_index = 0;  
+    for(let i = 1; i < points.length; i++) {
+        if(points[i].y > max_x) {
+            max_x = points[i].y;
+            max_index = i;
+        }
+    }
+    return max_index;
+}
+
+// return index 
+function getMinX(points) {
+    var min_x = points[0].x,
+        min_index = 0;  
+    for(let i = 1; i < points.length; i++) {
+        if(points[i].y < min_x) {
+            min_x = points[i].y;
             min_index = i;
         }
     }
